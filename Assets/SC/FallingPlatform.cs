@@ -1,0 +1,58 @@
+using UnityEngine;
+
+public class FallingPlatform : MonoBehaviour
+{
+    public float fallDelay = 2f; // «·„œ… «· Ì  »ﬁÏ ›ÌÂ« «·„‰’… ﬁ»· √‰  ”ﬁÿ
+    public float damageRate = 5f; // „⁄œ· «·÷—— «·–Ì Ì”»»Â «··«⁄» ﬂ· À«‰Ì…
+    private bool playerOnPlatform = false;
+    private float timeOnPlatform = 0f;
+    private Rigidbody2D rb;
+    private HealthController playerHealth; // „—Ã⁄ ≈·Ï HealthController «·Œ«’ »«··«⁄»
+
+    void Start()
+    {
+        rb = GetComponent<Rigidbody2D>();
+        rb.isKinematic = true; // ≈»ﬁ«¡ «·„‰’… À«» … Õ Ï ÌÕÌ‰ Êﬁ  ”ﬁÊÿÂ«
+    }
+
+    void Update()
+    {
+        if (playerOnPlatform)
+        {
+            timeOnPlatform += Time.deltaTime;
+
+            // ≈‰ﬁ«’ ’Õ… «··«⁄»  œ—ÌÃÌ«
+            if (playerHealth != null)
+            {
+                playerHealth.TakeDamage(damageRate * Time.deltaTime);
+            }
+
+            // »œ¡ ”ﬁÊÿ «·„‰’… »⁄œ «‰ﬁ÷«¡ «·„œ… «·„Õœœ…
+            if (timeOnPlatform >= fallDelay)
+            {
+                rb.isKinematic = false; //  ›⁄Ì· «·Ã«–»Ì… ·”ﬁÊÿ «·„‰’…
+                rb.gravityScale = 1;
+                Destroy(gameObject, 2f); // Õ–› «·„‰’… »⁄œ 2 À«‰Ì…
+            }
+        }
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            playerOnPlatform = true;
+            playerHealth = collision.gameObject.GetComponent<HealthController>(); // «·Õ’Ê· ⁄·Ï HealthController «·Œ«’ »«··«⁄»
+        }
+    }
+
+    void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            playerOnPlatform = false;
+            timeOnPlatform = 0f; // ≈⁄«œ… ÷»ÿ «·⁄œ«œ ≈–« €«œ— «··«⁄» «·„‰’…
+            playerHealth = null; // ≈“«·… «·„—Ã⁄ ≈·Ï HealthController
+        }
+    }
+}
